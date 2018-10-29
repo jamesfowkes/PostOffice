@@ -33,15 +33,17 @@ def check_rate_limit(connection_ip):
     for last in rate_limit_file:
         pass
 
-    if last.split(" ")[0] == time.strftime("%d/%m/%Y"):
+    last_split_parts = last.split(" ")
+
+    if last_split_parts[0] == time.strftime("%d/%m/%Y"):
         #Check the existing value for today
-        if int(last.split(" ")[1]) >= CONNECTION_LIMIT:
+        if int(last_split_parts[1]) >= CONNECTION_LIMIT:
             #Return false if we've exceeded the limit
             rate_limit_file.close()
             return False
         else:
             #Increment it
-            previous_val = int(last.split(" ")[1])
+            previous_val = int(last_split_parts[1])
             rate_limit_file.seek(0, os.SEEK_END)
             pos = rate_limit_file.tell() - 1
             while pos > 0 and rate_limit_file.read(1) != "\n":
@@ -53,7 +55,7 @@ def check_rate_limit(connection_ip):
                 rate_limit_file.truncate()
 
             rate_limit_file.write("\n"+time.strftime("%d/%m/%Y")+" "+str(previous_val+1))
-    elif last.split(" ")[0] != time.strftime("%d/%m/%Y"):
+    elif last_split_parts[0] != time.strftime("%d/%m/%Y"):
         #Add a new date if it doesnt exist yet.
         rate_limit_file.close()
         rate_limit_file = open(connection_ip+".rate", "a")
